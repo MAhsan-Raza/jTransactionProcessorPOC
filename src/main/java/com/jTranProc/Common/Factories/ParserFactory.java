@@ -15,10 +15,10 @@ public class ParserFactory {
         switch (pt)
         {
             case DELIMITED_PARSER:
-                parser = new JSONTransactionParser();
+                parser = new DelimitedTransactionParser(config);
                 break;
             case JSON_PARSER:
-                parser = new DelimitedTransactionParser();
+                parser = new JSONTransactionParser(config);
                 break;
             default:
                 throw new RuntimeException("Parser not implemented: " + pt.toString());

@@ -34,4 +34,9 @@ public class JLogger {
         if(PrintToConsole)
             System.out.println(DTF.format(LocalDateTime.now()) + "\t|\t" + logLine);
     }
+
+    public void WriteTrace(String logLine)
+    {
+        this.Write(LogLevel.TRACE, logLine);
+    }
 }

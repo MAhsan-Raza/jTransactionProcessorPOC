@@ -24,13 +24,17 @@ public class TranProcService {
 
     public void start(){
 
-        JLogger.Get().Write(LogLevel.TRACE, "Creating Member Objects");
+        JLogger.Get().Write(LogLevel.TRACE, "Starting JTranProc Service ");
 
         try {
+            JLogger.Get().Write(LogLevel.TRACE, "Loading configuration");
             ConfigurationStore cfgLdr = this.LoadConfig();
+            JLogger.Get().Write(LogLevel.TRACE, "Creating Member Objects");
             this.CreateMembers(cfgLdr);
+            JLogger.Get().Write(LogLevel.TRACE, "Initializing Message broker");
             this.InitiateMessagebroker();
 
+            JLogger.Get().Write(LogLevel.TRACE, "Starting Processor Services");
             this.StartProcessorServices();
         }
         catch (FileNotFoundException ex)
@@ -53,14 +57,18 @@ public class TranProcService {
     }
 
     private void StartProcessorServices() {
+        JLogger.Get().WriteTrace("Starting DelimitedParser Services");
+        this.DelimitedParser.Start();
+        JLogger.Get().WriteTrace("Starting TCP/IP Server");
+        this.TCPServer.Start();
     }
 
     private void InitiateMessagebroker() {
-        this.MessageBroker.InitiateMsgQueue(ServiceType.SVC_TCP_SERVER);
-        this.MessageBroker.InitiateMsgQueue(ServiceType.SVC_DELIMITED_PARSER);
-        this.MessageBroker.InitiateMsgQueue(ServiceType.SVC_TRAN_HANDLER);
-        this.MessageBroker.InitiateMsgQueue(ServiceType.SVC_JSON_PARSER);
-        this.MessageBroker.InitiateMsgQueue(ServiceType.SVC_REST_CLIENT);
+        this.MsgBroker.InitiateMsgQueue(ServiceType.SVC_TCP_SERVER);
+        this.MsgBroker.InitiateMsgQueue(ServiceType.SVC_DELIMITED_PARSER);
+        this.MsgBroker.InitiateMsgQueue(ServiceType.SVC_TRAN_HANDLER);
+        this.MsgBroker.InitiateMsgQueue(ServiceType.SVC_JSON_PARSER);
+        this.MsgBroker.InitiateMsgQueue(ServiceType.SVC_REST_CLIENT);
     }
 
     private void CreateMembers(ConfigurationStore cfgLdr) throws Exception {
@@ -70,11 +78,11 @@ public class TranProcService {
         ParserConfig DelimCfg = cfgLdr.ReadDelimitedParserConfig();
         ParserConfig JsonCfg = cfgLdr.ReadJsonParserConfig();
 
-        this.MessageBroker = new MessageBroker();
-        this.TCPServer = AdaptorFactory.CreateAdaptor(EnAdaptorType.TCP_SERVER, this.MessageBroker, TcpSrvrCfg);
-        this.RestClient = AdaptorFactory.CreateAdaptor(EnAdaptorType.REST_CLIENT, this.MessageBroker, RestClntCfg);
-        this.DelimitedParser = ParserFactory.CreateParser(EnParserType.DELIMITED_PARSER, this.MessageBroker, DelimCfg);
-        this.JsonParser = ParserFactory.CreateParser(EnParserType.JSON_PARSER, this.MessageBroker, JsonCfg);
+        this.MsgBroker = new MessageBroker();
+        this.TCPServer = AdaptorFactory.CreateAdaptor(EnAdaptorType.TCP_SERVER, this.MsgBroker, TcpSrvrCfg);
+        this.RestClient = AdaptorFactory.CreateAdaptor(EnAdaptorType.REST_CLIENT, this.MsgBroker, RestClntCfg);
+        this.DelimitedParser = ParserFactory.CreateParser(EnParserType.DELIMITED_PARSER, this.MsgBroker, DelimCfg);
+        this.JsonParser = ParserFactory.CreateParser(EnParserType.JSON_PARSER, this.MsgBroker, JsonCfg);
 
         this.TransactionHandler = new TransactionHandler();
     }
@@ -87,5 +95,5 @@ public class TranProcService {
     private ITransactionHandler TransactionHandler;
     private IParser DelimitedParser;
     private IParser JsonParser;
-    private IMsgBroker MessageBroker;
+    private IMsgBroker MsgBroker;
 }

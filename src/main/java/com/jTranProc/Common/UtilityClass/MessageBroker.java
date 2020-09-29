@@ -5,43 +5,43 @@ import com.jTranProc.Common.Enums.ServiceType;
 import com.jTranProc.Common.Interfaces.IMsgBroker;
 
 import java.util.HashMap;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class MessageBroker implements IMsgBroker {
 
     public MessageBroker()
     {
-        this.Queues = new ConcurrentHashMap<ServiceType, ConcurrentLinkedQueue<TranMessage>>();
+        this.Queues = new ConcurrentHashMap<ServiceType, BlockingQueue<Object>>();
     }
 
     @Override
-    public void RouteMsgToService(ServiceType svcTp, TranMessage msg) {
+    public void RouteMsgToService(ServiceType svcTp, Object msg) {
         if(Queues.keySet().contains(svcTp) == false)
             throw new IllegalArgumentException(
                     "MessageBroker.RouteMsgToService Service type not found: [" + svcTp.toString() + "]");
 
-        ConcurrentLinkedQueue<TranMessage> q = this.Queues.get(svcTp);
+        BlockingQueue<Object> q = this.Queues.get(svcTp);
         q.add(msg);
+        JLogger.Get().WriteTrace("Enqueued message for service: " + svcTp.toString());
     }
 
     @Override
-    public TranMessage TryGetMessage(ServiceType svcTp) {
+    public Object TryGetMessage(ServiceType svcTp) throws InterruptedException {
         if(Queues.keySet().contains(svcTp) == false)
             throw new IllegalArgumentException(
                     "MessageBroker.RouteMsgToService Service type not found: [" + svcTp.toString() + "]");
 
-        ConcurrentLinkedQueue<TranMessage> q = this.Queues.get(svcTp);
+        BlockingQueue<Object> q = this.Queues.get(svcTp);
 
-        if(q.isEmpty())
-            return null;
-
-        return q.remove();
+        return q.take();
     }
 
     @Override
     public void InitiateMsgQueue(ServiceType svcTp) {
-        this.Queues.put(svcTp, new ConcurrentLinkedQueue<TranMessage>());
+        this.Queues.put(svcTp, new LinkedBlockingQueue<Object>());
     }
 
     @Override
@@ -54,5 +54,5 @@ public class MessageBroker implements IMsgBroker {
 
     }
 
-    private ConcurrentHashMap<ServiceType, ConcurrentLinkedQueue<TranMessage>> Queues;
+    private ConcurrentHashMap<ServiceType, BlockingQueue<Object>> Queues;
 }
