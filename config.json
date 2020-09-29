@@ -1,0 +1,18 @@
+{
+  "TcpServer": {
+    "ListenPort": 55555,
+    "MetaLength": 4
+  },
+  "RestClient": {
+    "Address": "http://localhost:8080/JBankDemo"
+  },
+  "DelimitedParser": {
+    "Threads": 5
+  },
+  "JsonParser": {
+    "Threads": 5
+  },
+  "Processor": {
+    "Threads": 5
+  }
+}

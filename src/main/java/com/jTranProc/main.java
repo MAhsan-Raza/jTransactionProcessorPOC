@@ -1,9 +1,12 @@
 package com.jTranProc;
 
+import com.jTranProc.TranProcService;
+
 public class main {
 
     public static void main(String[] args) {
 
-        System.out.println("In Main JTP");
+        TranProcService tps = new TranProcService();
+        tps.start();
     }
 }

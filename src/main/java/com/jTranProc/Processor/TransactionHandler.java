@@ -1,9 +1,9 @@
-package com.jTranProc.Adaptor;
+package com.jTranProc.Processor;
 
-import com.jTranProc.Common.Interfaces.IAdaptor;
 import com.jTranProc.Common.Interfaces.IMsgBroker;
+import com.jTranProc.Common.Interfaces.ITransactionHandler;
 
-public class RESTClient implements IAdaptor {
+public class TransactionHandler implements ITransactionHandler {
     @Override
     public void SetMsgBroker(IMsgBroker imb) {
 
