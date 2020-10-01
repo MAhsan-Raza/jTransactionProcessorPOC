@@ -2,6 +2,9 @@ package com.jTranProc.DataAccessLayer;
 
 import com.jTranProc.Common.DataObjects.AdaptorConfig;
 import com.jTranProc.Common.DataObjects.ParserConfig;
+import com.jTranProc.Common.DataObjects.ProcessorConfig;
+import com.jTranProc.Common.UtilityClass.JLogger;
+
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
@@ -34,10 +37,27 @@ public class ConfigurationStore {
         return  null;
     }
     public ParserConfig ReadJsonParserConfig(){
-        return  null;
+        ParserConfig cfg = new ParserConfig();
+        JsonObject js = this.jsonRoot.getJsonObject("DelimitedParser");
+        cfg.ParserThreads = js.getInt("Threads");
+        return cfg;
     }
     public ParserConfig ReadDelimitedParserConfig(){
-        return  null;
+        ParserConfig cfg = new ParserConfig();
+        JsonObject js = this.jsonRoot.getJsonObject("DelimitedParser");
+        cfg.ParserThreads = js.getInt("Threads");
+        cfg.FieldDelimiter = js.getString("FieldDelimiter");
+        cfg.ValueDelimiter = js.getString("ValueDelimiter");
+        JLogger.Get().WriteTrace("Loaded Delimited Parser Config: Threads[" + cfg.ParserThreads
+            + "], FieldDelimiter[" + cfg.FieldDelimiter + "], ValueDelimiter[" + cfg.ValueDelimiter + "]");
+        return cfg;
+    }
+
+    public ProcessorConfig ReadTranProcessorConfig() {
+        ProcessorConfig cfg = new ProcessorConfig();
+        JsonObject js = this.jsonRoot.getJsonObject("Processor");
+        cfg.Threads = js.getInt("Threads");
+        return cfg;
     }
 
     private JsonObject jsonRoot;

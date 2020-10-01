@@ -2,6 +2,7 @@ package com.jTranProc;
 
 import com.jTranProc.Common.DataObjects.AdaptorConfig;
 import com.jTranProc.Common.DataObjects.ParserConfig;
+import com.jTranProc.Common.DataObjects.ProcessorConfig;
 import com.jTranProc.Common.Enums.EnAdaptorType;
 import com.jTranProc.Common.Enums.EnParserType;
 import com.jTranProc.Common.Enums.LogLevel;
@@ -59,6 +60,8 @@ public class TranProcService {
     private void StartProcessorServices() {
         JLogger.Get().WriteTrace("Starting DelimitedParser Services");
         this.DelimitedParser.Start();
+        JLogger.Get().WriteTrace("Starting Transaction Handler Services");
+        this.TransactionHandler.Start();
         JLogger.Get().WriteTrace("Starting TCP/IP Server");
         this.TCPServer.Start();
     }
@@ -77,6 +80,7 @@ public class TranProcService {
         AdaptorConfig RestClntCfg = cfgLdr.ReadRestClientConfig();
         ParserConfig DelimCfg = cfgLdr.ReadDelimitedParserConfig();
         ParserConfig JsonCfg = cfgLdr.ReadJsonParserConfig();
+        ProcessorConfig ProcCfg = cfgLdr.ReadTranProcessorConfig();
 
         this.MsgBroker = new MessageBroker();
         this.TCPServer = AdaptorFactory.CreateAdaptor(EnAdaptorType.TCP_SERVER, this.MsgBroker, TcpSrvrCfg);
@@ -84,7 +88,8 @@ public class TranProcService {
         this.DelimitedParser = ParserFactory.CreateParser(EnParserType.DELIMITED_PARSER, this.MsgBroker, DelimCfg);
         this.JsonParser = ParserFactory.CreateParser(EnParserType.JSON_PARSER, this.MsgBroker, JsonCfg);
 
-        this.TransactionHandler = new TransactionHandler();
+        this.TransactionHandler = new TransactionHandler(ProcCfg);
+        this.TransactionHandler.SetMsgBroker(this.MsgBroker);
     }
 
     private static String ConfigPath =

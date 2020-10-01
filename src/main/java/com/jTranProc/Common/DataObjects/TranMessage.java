@@ -37,5 +37,13 @@ public class TranMessage {
         JLogger.Get().Write(LogLevel.TRACE, sLog);
     }
 
-    ConcurrentHashMap<String, String> Msg;
+    public String GetStringMsg() {
+        StringBuilder sb = new StringBuilder();
+        for(Map.Entry<String, String> Set : this.Msg.entrySet()){
+            sb.append(Set.getKey() + "=" + Set.getValue() + ",");
+        }
+            return sb.toString();
+    }
+
+    private final ConcurrentHashMap<String, String> Msg = new ConcurrentHashMap<>();
 }
