@@ -1,62 +1,36 @@
 package com.jTranProc.Processor;
 
+import com.jTranProc.Common.BiDirectionalTTPSvc;
 import com.jTranProc.Common.DataObjects.ProcessorConfig;
 import com.jTranProc.Common.DataObjects.TranMessage;
 import com.jTranProc.Common.Enums.ServiceType;
-import com.jTranProc.Common.Interfaces.IMsgBroker;
-import com.jTranProc.Common.Interfaces.ITransactionHandler;
+import com.jTranProc.Common.ThreadedTpSvc;
 import com.jTranProc.Common.UtilityClass.JLogger;
 import com.jTranProc.DataAccessLayer.OracleTransactionLogger;
 
-import java.util.ArrayList;
-
-public class TransactionHandler implements ITransactionHandler {
+public class TransactionHandler extends BiDirectionalTTPSvc {
 
     public TransactionHandler(ProcessorConfig config){
-        this.IsRunning = true;
         this.Config = config;
-        this.ProcessorThreadGroup = new ArrayList<>();
-        for(Integer i=0; i<this.Config.Threads;i++){
-            ProcessorThreadGroup.add(new Thread(this::ThreadedProcessorMethod));
-        }}
-
-    @Override
-    public void SetMsgBroker(IMsgBroker imb) {
-        this.MsgBroker = imb;
-    }
-
-    @Override
-    public void Start() {
-        JLogger.Get().WriteTrace("Starting Transaction Processor threads");
-        for(Thread t : this.ProcessorThreadGroup)
-            t.start();
-    }
-
-    @Override
-    public void Stop() {
-
-    }
-
-    protected void ThreadedProcessorMethod() {
-        while (this.IsRunning) {
-
-            try {
-                TranMessage tmsg = (TranMessage) this.MsgBroker.TryGetMessage(ServiceType.SVC_TRAN_HANDLER);
-                JLogger.Get().WriteTrace("Transaction Processor got message: ");
-                this.HandleTransaction(tmsg);
-                this.MsgBroker.RouteMsgToService(ServiceType.SVC_JSON_PARSER, tmsg);
-            } catch (InterruptedException ex) {
-                JLogger.Get().WriteTrace("Transaction Processor thread Interrupted, error: " + ex.getMessage());
-                return;
-            }
         }
+
+    @Override
+    protected ServiceType GetResponseServiceType() { return ServiceType.SVC_TRAN_HANDLER_RESPONSE; }
+
+    @Override
+    protected ServiceType GetRequestServiceType() { return ServiceType.SVC_TRAN_HANDLER; }
+
+    @Override
+    protected void ProcessRequestMessage(Object msg) {
+        this.HandleTransactionRequest((TranMessage) msg);
+        this.MsgBroker.RouteMsgToService(ServiceType.SVC_JSON_PARSER, msg);
     }
 
-    private Boolean HandleTransaction(TranMessage tmsg) {
+    private Boolean HandleTransactionRequest(TranMessage tmsg) {
         try {
             OracleTransactionLogger otl = new OracleTransactionLogger();
-            if (otl.Initialize("jdbc:oracle:thin:@192.168.0.138:1521:ipath",
-                    "impact_psopsp1", "Ipath_2020") == false) {
+            if (otl.Initialize(this.Config.ConStr,
+                    this.Config.UID, this.Config.PWD) == false) {
                 JLogger.Get().WriteTrace("Failed to initialize OracleTransactionLogger");
                 return false;
             }
@@ -72,8 +46,31 @@ public class TransactionHandler implements ITransactionHandler {
         return false;
     }
 
-    private volatile Boolean IsRunning;
+    @Override
+    protected void ProcessResponseMessage(Object msg) {
+        this.HandleTransactionResponse((TranMessage) msg);
+        this.MsgBroker.RouteMsgToService(ServiceType.SVC_DELIMITED_PARSER_RESPONSE, msg);
+    }
+
+    protected void HandleTransactionResponse(TranMessage tmsg){
+        try {
+            OracleTransactionLogger otl = new OracleTransactionLogger();
+            if (otl.Initialize(this.Config.ConStr,
+                    this.Config.UID, this.Config.PWD) == false) {
+                JLogger.Get().WriteTrace("Failed to initialize OracleTransactionLogger");
+                return ;
+            }
+            if (otl.AddToResponseLog(tmsg) == false) {
+                JLogger.Get().WriteTrace("AddToResponseLog Failed");
+                return ;
+            }
+            return ;
+        }
+        catch (Exception ex){
+            JLogger.Get().WriteTrace("HandleTransaction crashed while handling response, error: " + ex.getMessage());
+        }
+        return ;
+    }
+
     private ProcessorConfig Config;
-    private ArrayList<Thread> ProcessorThreadGroup;
-    private IMsgBroker MsgBroker;
 }

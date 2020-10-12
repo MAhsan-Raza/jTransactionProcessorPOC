@@ -9,10 +9,7 @@ import com.jTranProc.Common.Enums.LogLevel;
 import com.jTranProc.Common.Enums.ServiceType;
 import com.jTranProc.Common.Factories.AdaptorFactory;
 import com.jTranProc.Common.Factories.ParserFactory;
-import com.jTranProc.Common.Interfaces.IMsgBroker;
-import com.jTranProc.Common.Interfaces.IParser;
-import com.jTranProc.Common.Interfaces.IAdaptor;
-import com.jTranProc.Common.Interfaces.ITransactionHandler;
+import com.jTranProc.Common.Interfaces.*;
 import com.jTranProc.Common.UtilityClass.JLogger;
 import com.jTranProc.Common.UtilityClass.MessageBroker;
 import com.jTranProc.DataAccessLayer.ConfigurationStore;
@@ -58,6 +55,10 @@ public class TranProcService {
     }
 
     private void StartProcessorServices() {
+        JLogger.Get().WriteTrace("Starting RESTClient Services");
+        this.RestClient.Start();
+        JLogger.Get().WriteTrace("Starting JSONParser Services");
+        this.JsonParser.Start();
         JLogger.Get().WriteTrace("Starting DelimitedParser Services");
         this.DelimitedParser.Start();
         JLogger.Get().WriteTrace("Starting Transaction Handler Services");
@@ -89,16 +90,16 @@ public class TranProcService {
         this.JsonParser = ParserFactory.CreateParser(EnParserType.JSON_PARSER, this.MsgBroker, JsonCfg);
 
         this.TransactionHandler = new TransactionHandler(ProcCfg);
-        this.TransactionHandler.SetMsgBroker(this.MsgBroker);
+        this.TransactionHandler.Initialize(this.MsgBroker, ProcCfg.Threads);
     }
 
     private static String ConfigPath =
             "C:\\Users\\ahsan.razaa\\IdeaProjects\\jTransactionProcessorPOC\\config.json";
 
-    private IAdaptor TCPServer;
-    private IAdaptor RestClient;
-    private ITransactionHandler TransactionHandler;
-    private IParser DelimitedParser;
-    private IParser JsonParser;
+    private ITPSvc TCPServer;
+    private ITPSvc RestClient;
+    private ITPSvc TransactionHandler;
+    private ITPSvc DelimitedParser;
+    private ITPSvc JsonParser;
     private IMsgBroker MsgBroker;
 }

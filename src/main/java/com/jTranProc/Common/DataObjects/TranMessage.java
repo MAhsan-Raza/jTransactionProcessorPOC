@@ -4,6 +4,7 @@ import com.jTranProc.Common.Enums.LogLevel;
 import com.jTranProc.Common.UtilityClass.JLogger;
 
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,6 +14,10 @@ public class TranMessage {
     public String GetField(String Tag) {
 
         return Msg.get(Tag);
+    }
+
+    public Enumeration<String> GetKeys(){
+        return this.Msg.keys();
     }
 
     public void SetField(String Tag, String Value){

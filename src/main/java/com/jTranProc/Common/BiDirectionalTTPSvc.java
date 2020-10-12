@@ -41,7 +41,7 @@ public abstract class BiDirectionalTTPSvc extends ThreadedTpSvc {
         this.ProcessRequestMessage(msg);
     }
 
-    @Override
+    @Override final
     public ServiceType GetServiceType() { return this.GetRequestServiceType(); }
 
     private void ResponseProcThreadMethod(){

@@ -3,15 +3,15 @@ package com.jTranProc.Common.Factories;
 import com.jTranProc.Common.DataObjects.ParserConfig;
 import com.jTranProc.Common.Enums.EnParserType;
 import com.jTranProc.Common.Interfaces.IMsgBroker;
-import com.jTranProc.Common.Interfaces.IParser;
+import com.jTranProc.Common.Interfaces.ITPSvc;
 import com.jTranProc.Parser.DelimitedTransactionParser;
 import com.jTranProc.Parser.JSONTransactionParser;
 
 public class ParserFactory {
 
-    public static IParser CreateParser(EnParserType pt, IMsgBroker broker, ParserConfig config){
+    public static ITPSvc CreateParser(EnParserType pt, IMsgBroker broker, ParserConfig config){
 
-        IParser parser = null;
+        ITPSvc parser = null;
         switch (pt)
         {
             case DELIMITED_PARSER:
@@ -25,7 +25,7 @@ public class ParserFactory {
         }
 
         if(parser != null)
-            parser.SetMsgBroker(broker);
+            parser.Initialize(broker, config.ParserThreads);
 
         return parser;
     }

@@ -34,7 +34,10 @@ public class ConfigurationStore {
     }
 
     public AdaptorConfig ReadRestClientConfig(){
-        return  null;
+        AdaptorConfig cfg = new AdaptorConfig();
+        JsonObject jsTcpSrvr = this.jsonRoot.getJsonObject("RestClient");
+        cfg.URI = jsTcpSrvr.getString("Address");
+        return cfg;
     }
     public ParserConfig ReadJsonParserConfig(){
         ParserConfig cfg = new ParserConfig();

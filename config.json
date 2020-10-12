@@ -7,12 +7,17 @@
     "Address": "http://localhost:8080/JBankDemo"
   },
   "DelimitedParser": {
-    "Threads": 5
+    "Threads": 1,
+    "ValueDelimiter": "=",
+    "FieldDelimiter": ","
   },
   "JsonParser": {
-    "Threads": 5
+    "Threads": 1
   },
   "Processor": {
-    "Threads": 5
+    "Threads": 1,
+    "CONSTR": "jdbc:oracle:thin:@192.168.0.138:1521:ipath",
+    "UID": "impact_psopsp1",
+    "PWD": "Ipath_2020"
   }
 }

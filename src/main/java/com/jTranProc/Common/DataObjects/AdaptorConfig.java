@@ -4,4 +4,6 @@ public class AdaptorConfig
 {
     public int ListenPort;
     public int MetaLength;
+
+    public String URI;
 }

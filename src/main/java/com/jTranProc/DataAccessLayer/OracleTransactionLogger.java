@@ -53,4 +53,8 @@ public class OracleTransactionLogger {
     private String ConStr;
     private String UID;
     private String PWD;
+
+    public boolean AddToResponseLog(TranMessage tmsg) {
+        return false;
+    }
 }
