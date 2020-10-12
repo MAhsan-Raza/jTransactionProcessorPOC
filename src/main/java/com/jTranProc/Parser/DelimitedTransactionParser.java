@@ -1,19 +1,20 @@
 package com.jTranProc.Parser;
 
+import com.jTranProc.Common.BiDirectionalTTPSvc;
 import com.jTranProc.Common.DataObjects.ParserConfig;
 import com.jTranProc.Common.DataObjects.TranMessage;
 import com.jTranProc.Common.Enums.ServiceType;
 import com.jTranProc.Common.ThreadedTpSvc;
 import com.jTranProc.Common.UtilityClass.JLogger;
 
-public class DelimitedTransactionParser extends ThreadedTpSvc {
+public class DelimitedTransactionParser extends BiDirectionalTTPSvc {
 
     public DelimitedTransactionParser(ParserConfig config){
         this.Config = config;
     }
 
     @Override
-    public void ProcessMessage(Object msg) {
+    protected void ProcessRequestMessage(Object msg) {
         JLogger.Get().WriteTrace("DelimitedTransactionParser got message: " + (String) msg);
         TranMessage tranMessage = this.CreateTranMessage((String) msg);
         JLogger.Get().WriteTrace("Created Tran Message: " + msg);
@@ -22,9 +23,15 @@ public class DelimitedTransactionParser extends ThreadedTpSvc {
     }
 
     @Override
-    public ServiceType GetServiceType() {
-        return ServiceType.SVC_DELIMITED_PARSER;
+    protected void ProcessResponseMessage(Object msg) {
+
     }
+
+    @Override
+    protected ServiceType GetResponseServiceType() { return ServiceType.SVC_DELIMITED_PARSER; }
+
+    @Override
+    protected ServiceType GetRequestServiceType() { return ServiceType.SVC_DELIMITED_PARSER_RESPONSE; }
 
     private TranMessage CreateTranMessage(String msg) {
         TranMessage rezMessage = new TranMessage();
