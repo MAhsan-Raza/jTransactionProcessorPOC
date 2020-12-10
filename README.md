@@ -6,4 +6,5 @@ It is divided into three main module types
   - Adaptors (TCP/IP & RESTful)
   - Parsers (Delimiter based message parsers & JSON)
   - Channel Processor
-Each module (Parsers, adaptors, processors) have their own configurable thread-pools, so we can configure each of them based on load requirements.
+
+ &amp; Each module (Parsers, adaptors, processors) have their own configurable thread-pools, so we can configure each of them based on load requirements.
