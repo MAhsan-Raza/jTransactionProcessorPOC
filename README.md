@@ -1,5 +1,5 @@
 # jTransactionProcessorPOC
-Simple integration layer &amp; transaction processor between a TCP/IP based system communicating on delimited protocol &amp; a RESTful web service using JSON as its communication protocol.
+Simple integration layer &amp; transaction processor between a TCP/IP based system communicating on delimited protocol &amp; a RESTful web service using JSON as its communication protocol. It is written in JAVA.
 
 It uses the Asynchronous Message Broker as a base pattern, 
 It is divided into three main module types 
